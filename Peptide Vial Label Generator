@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Peptide Vial Label Generator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, Helvetica, sans-serif; background: #f4f6f9; color: #111; min-height: 100vh; padding: 2rem 1rem; }
+  h1 { text-align: center; font-size: 22px; font-weight: 700; margin-bottom: 6px; color: #1a1a2e; }
+  .subtitle { text-align: center; font-size: 13px; color: #666; margin-bottom: 2rem; }
+  .app { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 820px; margin: 0 auto; align-items: start; }
+  @media (max-width: 600px) { .app { grid-template-columns: 1fr; } }
+  .panel { background: white; border: 1px solid #e0e0e0; border-radius: 12px; padding: 1.5rem; }
+  .panel h2 { font-size: 12px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 1.1rem; }
+  .field { margin-bottom: 13px; }
+  .field label { display: block; font-size: 13px; color: #555; margin-bottom: 4px; font-weight: 500; }
+  .field input { width: 100%; font-size: 13px; padding: 8px 10px; border-radius: 7px; border: 1px solid #ddd; background: #fafafa; color: #111; font-family: Arial, sans-serif; transition: border-color 0.15s; }
+  .field input:focus { outline: none; border-color: #1a56db; background: white; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .preview-area { background: #f0f2f5; border-radius: 10px; padding: 1.5rem; display: flex; justify-content: center; align-items: center; min-height: 170px; margin-bottom: 14px; }
+
+  /* Label styles */
+  .label-box {
+    width: 300px;
+    height: 150px;
+    background: white;
+    border: 1.5px solid #333;
+    border-radius: 4px;
+    padding: 10px 12px 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #111;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+  }
+  .label-brandname { font-size: 18px; font-weight: 900; color: #1a56db; line-height: 1; word-break: break-word; }
+  .label-brandname.empty { color: #bbb; font-weight: 400; font-size: 14px; }
+  .label-main { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 1px; }
+  .label-line { font-size: 15px; font-weight: 700; color: #111; text-transform: uppercase; line-height: 1.15; word-break: break-word; }
+  .label-line.empty { color: #bbb; font-weight: 400; text-transform: none; font-size: 13px; }
+  .label-footer { font-size: 11px; font-weight: 700; color: #111; text-transform: uppercase; border-top: 1px solid #ddd; padding-top: 5px; display: flex; justify-content: space-between; align-items: flex-end; }
+  .label-url { font-size: 9px; color: #888; font-weight: 400; }
+
+  /* Buttons */
+  .btn-row { display: flex; gap: 8px; margin-top: 4px; }
+  button { cursor: pointer; font-family: Arial, sans-serif; border-radius: 7px; font-size: 13px; padding: 9px 16px; border: 1px solid #ccc; background: white; color: #111; transition: background 0.15s; font-weight: 500; }
+  button:hover { background: #f0f2f5; }
+  .btn-gen { background: #1a56db; color: white; border-color: #1a56db; flex: 1; }
+  .btn-gen:hover { background: #1446b8; }
+  .btn-dl { flex: 1; }
+  .btn-dl:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-reset { color: #888; border-color: #e0e0e0; }
+  .hint { font-size: 11px; color: #999; text-align: center; margin-top: 10px; }
+
+  /* Instructions */
+  .instructions { max-width: 820px; margin: 0 auto 1.5rem; background: white; border: 1px solid #e0e0e0; border-radius: 12px; padding: 1.25rem 1.5rem; }
+  .instructions h3 { font-size: 14px; font-weight: 700; margin-bottom: 10px; color: #1a1a2e; }
+  .instructions ol { padding-left: 1.2rem; }
+  .instructions li { font-size: 13px; color: #555; margin-bottom: 5px; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<h1>Peptide Vial Label Generator</h1>
+<p class="subtitle">20 × 40mm · fits 3ml peptide vials · Niimbot &amp; compatible label printers</p>
+
+<div class="instructions">
+  <h3>How to use</h3>
+  <ol>
+    <li>Enter your <strong>brand / lab name</strong> — this appears at the top of the label.</li>
+    <li>Fill in <strong>manufacturer, peptide name, size,</strong> and <strong>date</strong>.</li>
+    <li>Optionally add a <strong>URL</strong> (shown as small text) and edit the <strong>footer note</strong>.</li>
+    <li>Click <strong>Generate Label</strong> to confirm, then <strong>Download JPEG</strong>.</li>
+    <li>Print at 100% scale on a <strong>20 × 40mm</strong> label using Niimbot or any compatible printer.</li>
+  </ol>
+</div>
+
+<div class="app">
+  <!-- Form -->
+  <div class="panel">
+    <h2>Label fields</h2>
+    <div class="field">
+      <label>Your brand / lab name (top, large)</label>
+      <input type="text" id="brand" placeholder="e.g. MyPeptideLab" oninput="liveUpdate()" />
+    </div>
+    <div class="field">
+      <label>Manufacturer</label>
+      <input type="text" id="mfr" placeholder="e.g. Nexaph" oninput="liveUpdate()" />
+    </div>
+    <div class="field">
+      <label>Peptide name</label>
+      <input type="text" id="peptide" placeholder="e.g. Tesamorelin" oninput="liveUpdate()" />
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Size / Amount</label>
+        <input type="text" id="size" placeholder="e.g. 10mg" oninput="liveUpdate()" />
+      </div>
+      <div class="field">
+        <label>Date</label>
+        <input type="text" id="date" placeholder="e.g. APR 26" oninput="liveUpdate()" />
+      </div>
+    </div>
+    <div class="field">
+      <label>URL (optional — shown small)</label>
+      <input type="text" id="url" placeholder="https://example.com" oninput="liveUpdate()" />
+    </div>
+    <div class="field">
+      <label>Footer note</label>
+      <input type="text" id="footer" placeholder="RESEARCH USE ONLY" value="RESEARCH USE ONLY" oninput="liveUpdate()" />
+    </div>
+    <div class="btn-row">
+      <button class="btn-reset" onclick="resetFields()">Reset</button>
+      <button class="btn-gen" onclick="generateLabel()">Generate label</button>
+    </div>
+  </div>
+
+  <!-- Preview -->
+  <div class="panel">
+    <h2>Preview</h2>
+    <div class="preview-area">
+      <div class="label-box" id="labelBox">
+        <div class="label-brandname empty" id="prevBrand">YourBrand.com</div>
+        <div class="label-main">
+          <div class="label-line empty" id="prevMfr">Manufacturer</div>
+          <div class="label-line empty" id="prevPeptide">Peptide Name</div>
+          <div class="label-line empty" id="prevSize">Size</div>
+          <div class="label-line empty" id="prevDate">Date</div>
+        </div>
+        <div class="label-footer">
+          <span id="prevFooter">RESEARCH USE ONLY</span>
+          <span class="label-url" id="prevUrl"></span>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-dl" id="dlBtn" onclick="downloadJpeg()" disabled>Download JPEG</button>
+    </div>
+    <div class="hint">Preview shown at ~3× actual size</div>
+  </div>
+</div>
+
+<script>
+  function val(id) { return document.getElementById(id).value.trim(); }
+
+  function liveUpdate() {
+    const brand = val('brand');
+    const mfr = val('mfr');
+    const peptide = val('peptide');
+    const size = val('size');
+    const date = val('date');
+    const footer = val('footer');
+    const url = val('url');
+
+    const pb = document.getElementById('prevBrand');
+    pb.textContent = brand || 'YourBrand.com';
+    pb.className = 'label-brandname' + (brand ? '' : ' empty');
+
+    setLine('prevMfr', mfr, 'Manufacturer');
+    setLine('prevPeptide', peptide, 'Peptide Name');
+    setLine('prevSize', size, 'Size');
+    setLine('prevDate', date, 'Date');
+
+    document.getElementById('prevFooter').textContent = footer || 'RESEARCH USE ONLY';
+    document.getElementById('prevUrl').textContent = url ? shortenUrl(url) : '';
+  }
+
+  function setLine(id, v, placeholder) {
+    const el = document.getElementById(id);
+    el.textContent = v ? v.toUpperCase() : placeholder;
+    el.className = 'label-line' + (v ? '' : ' empty');
+  }
+
+  function shortenUrl(u) {
+    try { return new URL(u).hostname; } catch(e) { return u; }
+  }
+
+  function generateLabel() {
+    liveUpdate();
+    const dlBtn = document.getElementById('dlBtn');
+    dlBtn.disabled = false;
+    dlBtn.style.opacity = '1';
+  }
+
+  function resetFields() {
+    ['brand','mfr','peptide','size','date','url'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('footer').value = 'RESEARCH USE ONLY';
+    document.getElementById('dlBtn').disabled = true;
+    document.getElementById('dlBtn').style.opacity = '';
+    liveUpdate();
+  }
+
+  function downloadJpeg() {
+    const label = document.getElementById('labelBox');
+    html2canvas(label, {
+      scale: 4,
+      backgroundColor: '#ffffff',
+      useCORS: true,
+      logging: false
+    }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = 'peptide-label.jpg';
+      link.href = canvas.toDataURL('image/jpeg', 0.97);
+      link.click();
+    });
+  }
+</script>
+</body>
+</html>
