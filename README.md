@@ -13,4 +13,4 @@ Designed to fit 20 × 40mm labels and print on Niimbot or compatible label print
 
 ## Live tool
 
-👉 https://prestonvv.github.io/PepLabelGenerator/
+👉 https://prestonvv.github.io/Peps/
