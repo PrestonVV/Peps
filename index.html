@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Peptide Label Generator — M2 Optimized</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!-- QR Code Library -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { 
@@ -81,6 +84,19 @@
     line-height: 1.3;
   }
   .label-units.empty { color: #cccccc; font-weight: 400; font-size: 12px; }
+  .label-qr {
+    position: absolute; bottom: 8px; right: 8px;
+    width: 50px; height: 50px;
+    background: #ffffff;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .label-qr canvas, .label-qr img { width: 100% !important; height: 100% !important; }
+  .label-qr-placeholder {
+    width: 100%; height: 100%;
+    border: 1px dashed #cccccc;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 8px; color: #cccccc; text-align: center;
+  }
   .label-sidebar {
     width: 28px; background: #ffffff;
     display: flex; align-items: center; justify-content: center;
@@ -150,6 +166,12 @@
       <input type="text" id="units" placeholder="1mg = 10 units" oninput="liveUpdate()" />
     </div>
 
+    <div class="section-divider">QR Code</div>
+    <div class="field">
+      <label>QR Code URL</label>
+      <input type="text" id="qrUrl" placeholder="https://example.com/coa" oninput="updateQR()" />
+    </div>
+
     <div class="btn-row">
       <button class="btn-reset" onclick="resetFields()">Reset</button>
       <button class="btn-gen" onclick="generateLabel()">Generate Label</button>
@@ -167,6 +189,9 @@
           <div class="label-dose empty" id="prevDose">Dose Schedule</div>
           <div class="label-cycle empty" id="prevCycle">Cycle / Duration</div>
           <div class="label-units empty" id="prevUnits">Dose = Units</div>
+        </div>
+        <div class="label-qr" id="labelQr">
+          <div class="label-qr-placeholder">QR</div>
         </div>
         <div class="label-sidebar">
           <div class="label-sidebar-text">For Research Purposes Only<br>Store Refrigerated</div>
@@ -194,6 +219,7 @@
   function liveUpdate() {
     const peptide = val('peptide'), mg = val('mg'), date = val('date');
     const dose = val('dose'), cycle = val('cycle'), units = val('units');
+    const qrUrl = val('qrUrl');
 
     const pp = document.getElementById('prevPeptide');
     pp.textContent = peptide || 'Peptide Name';
@@ -215,6 +241,24 @@
     const pu = document.getElementById('prevUnits');
     pu.textContent = units || 'Dose = Units';
     pu.className = 'label-units' + (units ? '' : ' empty');
+
+    updateQR(qrUrl);
+  }
+
+  function updateQR(url) {
+    const qrContainer = document.getElementById('labelQr');
+    if (!url) {
+      qrContainer.innerHTML = '<div class="label-qr-placeholder">QR</div>';
+      return;
+    }
+    qrContainer.innerHTML = '';
+    QRCode.toCanvas(url, { width: 50, margin: 0, color: { dark: '#000000', light: '#ffffff' } }, function(error, canvas) {
+      if (error) {
+        qrContainer.innerHTML = '<div class="label-qr-placeholder">QR</div>';
+        return;
+      }
+      qrContainer.appendChild(canvas);
+    });
   }
 
   function generateLabel() {
@@ -225,9 +269,10 @@
   }
 
   function resetFields() {
-    ['peptide','mg','date','dose','cycle','units'].forEach(id => document.getElementById(id).value = '');
+    ['peptide','mg','date','dose','cycle','units','qrUrl'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('dlBtn').disabled = true;
     document.getElementById('dlBtn').style.opacity = '';
+    document.getElementById('labelQr').innerHTML = '<div class="label-qr-placeholder">QR</div>';
     liveUpdate();
   }
 
