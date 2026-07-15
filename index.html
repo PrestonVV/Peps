@@ -245,13 +245,39 @@
       return;
     }
     qrContainer.innerHTML = '';
-    QRCode.toCanvas(url, { width: 50, margin: 0, color: { dark: '#000000', light: '#ffffff' } }, function(error, canvas) {
-      if (error) {
+    
+    // Create canvas for QR code
+    const qrCanvas = document.createElement('canvas');
+    qrCanvas.width = 70;
+    qrCanvas.height = 70;
+    qrCanvas.style.width = '70px';
+    qrCanvas.style.height = '70px';
+    
+    try {
+      // Use QRCode library to generate
+      if (typeof QRCode !== 'undefined' && QRCode.toCanvas) {
+        QRCode.toCanvas(qrCanvas, url, { 
+          width: 70, 
+          margin: 1, 
+          color: { dark: '#000000', light: '#ffffff' },
+          errorCorrectionLevel: 'M'
+        }, function(error) {
+          if (error) {
+            console.error('QR Code error:', error);
+            qrContainer.innerHTML = '<div class="label-qr-placeholder">QR</div>';
+          } else {
+            qrContainer.appendChild(qrCanvas);
+          }
+        });
+      } else {
+        // Fallback: show placeholder if library not loaded
         qrContainer.innerHTML = '<div class="label-qr-placeholder">QR</div>';
-        return;
+        console.error('QRCode library not loaded');
       }
-      qrContainer.appendChild(canvas);
-    });
+    } catch (e) {
+      console.error('QR Code generation failed:', e);
+      qrContainer.innerHTML = '<div class="label-qr-placeholder">QR</div>';
+    }
   }
 
   function generateLabel() {
@@ -259,29 +285,32 @@
     const dlBtn = document.getElementById('dlBtn');
     dlBtn.disabled = false;
     dlBtn.style.opacity = '1';
+    console.log('Label generated, download enabled');
   }
 
   function resetFields() {
     ['peptide','mg','date','dose','cycle','units','qrUrl'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('dlBtn').disabled = true;
-    document.getElementById('dlBtn').style.opacity = '';
+    document.getElementById('dlBtn').style.opacity = '0.4';
     document.getElementById('labelQr').innerHTML = '<div class="label-qr-placeholder">QR</div>';
     liveUpdate();
   }
 
   function downloadPng() {
+    console.log('Download clicked');
     const label = document.getElementById('labelBox');
-    // M2 is 203 DPI. 40mm = 320px, 20mm = 160px at native resolution
-    // Output at 2x (640×320) for crisp rendering, then M2 scales perfectly
+    
     html2canvas(label, {
       scale: 2,
       backgroundColor: '#ffffff',
       useCORS: true,
-      logging: false,
+      logging: true,
       imageSmoothingEnabled: false,
       letterRendering: true,
       removeContainer: true
     }).then(canvas => {
+      console.log('Canvas created:', canvas.width, 'x', canvas.height);
+      
       // Resize to exact M2 native resolution: 320×160px
       const targetCanvas = document.createElement('canvas');
       targetCanvas.width = 320;
@@ -294,9 +323,21 @@
       const peptideName = val('peptide') || 'peptide';
       link.download = peptideName.replace(/[^a-zA-Z0-9]/g, '_') + '_label.png';
       link.href = targetCanvas.toDataURL('image/png');
+      
+      console.log('Downloading:', link.download);
       link.click();
+    }).catch(err => {
+      console.error('Download failed:', err);
+      alert('Download failed. Please try again.');
     });
   }
+
+  // Check if libraries are loaded
+  window.addEventListener('load', function() {
+    console.log('Page loaded');
+    console.log('html2canvas:', typeof html2canvas);
+    console.log('QRCode:', typeof QRCode);
+  });
 </script>
 </body>
 </html>
