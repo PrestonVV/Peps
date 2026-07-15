@@ -46,17 +46,28 @@
   .label-box {
     width: 400px; height: 200px; background: #ffffff;
     font-family: Arial, Helvetica, sans-serif;
-    display: flex; flex-direction: row;
+    display: flex; flex-direction: column;
     overflow: hidden; position: relative;
     box-shadow: 0 4px 20px rgba(0,0,0,0.3);
   }
-  .label-bar {
-    width: 20px; background: #000000; flex-shrink: 0;
+  .label-main {
+    flex: 1; display: flex; flex-direction: row;
+    padding: 12px 14px 8px 14px;
   }
   .label-content {
-    flex: 1; padding: 12px 14px 12px 16px;
-    display: flex; flex-direction: column; justify-content: center;
+    flex: 1; display: flex; flex-direction: column; justify-content: center;
     min-width: 0;
+  }
+  .label-qr {
+    width: 70px; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .label-qr canvas, .label-qr img { width: 70px !important; height: 70px !important; }
+  .label-qr-placeholder {
+    width: 70px; height: 70px;
+    border: 1px dashed #cccccc;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: #cccccc; text-align: center;
   }
   .label-peptide { 
     font-size: 32px; font-weight: 900; color: #000000; 
@@ -84,29 +95,12 @@
     line-height: 1.3;
   }
   .label-units.empty { color: #cccccc; font-weight: 400; font-size: 12px; }
-  .label-qr {
-    position: absolute; bottom: 8px; right: 8px;
-    width: 50px; height: 50px;
-    background: #ffffff;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .label-qr canvas, .label-qr img { width: 100% !important; height: 100% !important; }
-  .label-qr-placeholder {
-    width: 100%; height: 100%;
-    border: 1px dashed #cccccc;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 8px; color: #cccccc; text-align: center;
-  }
-  .label-sidebar {
-    width: 28px; background: #ffffff;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; border-left: 1px solid #e0e0e0;
-  }
-  .label-sidebar-text {
-    writing-mode: vertical-lr; text-orientation: mixed;
+  .label-footer {
+    border-top: 1px solid #e0e0e0;
+    padding: 6px 14px;
+    text-align: center;
     font-size: 10px; font-weight: 700; color: #000000;
     text-transform: uppercase; letter-spacing: 0.5px;
-    text-align: center; line-height: 1.4;
   }
 
   /* Buttons */
@@ -182,20 +176,19 @@
     <h2>Preview</h2>
     <div class="preview-area">
       <div class="label-box" id="labelBox">
-        <div class="label-bar"></div>
-        <div class="label-content">
-          <div class="label-peptide empty" id="prevPeptide">Peptide Name</div>
-          <div class="label-mg empty" id="prevMg">Amount</div>
-          <div class="label-dose empty" id="prevDose">Dose Schedule</div>
-          <div class="label-cycle empty" id="prevCycle">Cycle / Duration</div>
-          <div class="label-units empty" id="prevUnits">Dose = Units</div>
+        <div class="label-main">
+          <div class="label-content">
+            <div class="label-peptide empty" id="prevPeptide">Peptide Name</div>
+            <div class="label-mg empty" id="prevMg">Amount</div>
+            <div class="label-dose empty" id="prevDose">Dose Schedule</div>
+            <div class="label-cycle empty" id="prevCycle">Cycle / Duration</div>
+            <div class="label-units empty" id="prevUnits">Dose = Units</div>
+          </div>
+          <div class="label-qr" id="labelQr">
+            <div class="label-qr-placeholder">QR</div>
+          </div>
         </div>
-        <div class="label-qr" id="labelQr">
-          <div class="label-qr-placeholder">QR</div>
-        </div>
-        <div class="label-sidebar">
-          <div class="label-sidebar-text">For Research Purposes Only<br>Store Refrigerated</div>
-        </div>
+        <div class="label-footer">For Research Purposes Only</div>
       </div>
     </div>
     <div class="btn-row">
