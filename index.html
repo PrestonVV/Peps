@@ -233,22 +233,29 @@
 
   function downloadPng() {
     const label = document.getElementById('labelBox');
-    // Scale 5x for crisp 203 DPI output (400px × 5 = 2000px wide = ~319px at 203 DPI... wait)
-    // Actually: 400px × 5 = 2000px. At 96 DPI screen that's ~20.8 inches. 
-    // For M2 at 203 DPI, 40mm = 319px, 20mm = 159px
-    // So we want output at 319×159px for actual size, but let's do 2x for quality = 638×318px
+    // M2 is 203 DPI. 40mm = 320px, 20mm = 160px at native resolution
+    // Output at 2x (640×320) for crisp rendering, then M2 scales perfectly
     html2canvas(label, {
       scale: 2,
       backgroundColor: '#ffffff',
       useCORS: true,
       logging: false,
       imageSmoothingEnabled: false,
-      letterRendering: true
+      letterRendering: true,
+      removeContainer: true
     }).then(canvas => {
+      // Resize to exact M2 native resolution: 320×160px
+      const targetCanvas = document.createElement('canvas');
+      targetCanvas.width = 320;
+      targetCanvas.height = 160;
+      const ctx = targetCanvas.getContext('2d');
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(canvas, 0, 0, 320, 160);
+      
       const link = document.createElement('a');
       const peptideName = val('peptide') || 'peptide';
       link.download = peptideName.replace(/[^a-zA-Z0-9]/g, '_') + '_label.png';
-      link.href = canvas.toDataURL('image/png');
+      link.href = targetCanvas.toDataURL('image/png');
       link.click();
     });
   }
