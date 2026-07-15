@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Peptide Label Generator — M2 Optimized</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<!-- QR Code Library -->
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -246,31 +245,18 @@
     }
     qrContainer.innerHTML = '';
     
-    // Create canvas for QR code
-    const qrCanvas = document.createElement('canvas');
-    qrCanvas.width = 70;
-    qrCanvas.height = 70;
-    qrCanvas.style.width = '70px';
-    qrCanvas.style.height = '70px';
-    
     try {
-      // Use QRCode library to generate
-      if (typeof QRCode !== 'undefined' && QRCode.toCanvas) {
-        QRCode.toCanvas(qrCanvas, url, { 
-          width: 70, 
-          margin: 1, 
-          color: { dark: '#000000', light: '#ffffff' },
-          errorCorrectionLevel: 'M'
-        }, function(error) {
-          if (error) {
-            console.error('QR Code error:', error);
-            qrContainer.innerHTML = '<div class="label-qr-placeholder">QR</div>';
-          } else {
-            qrContainer.appendChild(qrCanvas);
-          }
+      // Use QRCode library (qrcodejs)
+      if (typeof QRCode !== 'undefined') {
+        new QRCode(qrContainer, {
+          text: url,
+          width: 70,
+          height: 70,
+          colorDark: '#000000',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
         });
       } else {
-        // Fallback: show placeholder if library not loaded
         qrContainer.innerHTML = '<div class="label-qr-placeholder">QR</div>';
         console.error('QRCode library not loaded');
       }
@@ -301,7 +287,7 @@
     const label = document.getElementById('labelBox');
     
     html2canvas(label, {
-      scale: 2,
+      scale: 1,
       backgroundColor: '#ffffff',
       useCORS: true,
       logging: true,
@@ -311,18 +297,10 @@
     }).then(canvas => {
       console.log('Canvas created:', canvas.width, 'x', canvas.height);
       
-      // Resize to exact M2 native resolution: 320×160px
-      const targetCanvas = document.createElement('canvas');
-      targetCanvas.width = 320;
-      targetCanvas.height = 160;
-      const ctx = targetCanvas.getContext('2d');
-      ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(canvas, 0, 0, 320, 160);
-      
       const link = document.createElement('a');
       const peptideName = val('peptide') || 'peptide';
       link.download = peptideName.replace(/[^a-zA-Z0-9]/g, '_') + '_label.png';
-      link.href = targetCanvas.toDataURL('image/png');
+      link.href = canvas.toDataURL('image/png');
       
       console.log('Downloading:', link.download);
       link.click();
