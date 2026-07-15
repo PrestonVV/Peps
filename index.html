@@ -3,151 +3,133 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Peptide Enthusiast Label Generator</title>
+<title>Peptide Label Generator — M2 Optimized</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: Arial, Helvetica, sans-serif; background: #f4f6f9; color: #111; min-height: 100vh; padding: 2rem 1rem; }
-  .title { text-align: center; font-size: 22px; font-weight: 700; margin-bottom: 6px; color: #1a1a2e; }
-  .subtitle { text-align: center; font-size: 13px; color: #666; margin-bottom: 1.5rem; }
-  .app { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 820px; margin: 0 auto; align-items: start; }
-  @media (max-width: 600px) { .app { grid-template-columns: 1fr; } }
-  .panel { background: white; border: 1px solid #e0e0e0; border-radius: 12px; padding: 1.5rem; }
-  .panel h2 { font-size: 12px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 1.1rem; }
-  .field { margin-bottom: 13px; }
-  .field label { display: block; font-size: 13px; font-weight: 700; color: #111; margin-bottom: 4px; }
-  .field input { width: 100%; font-size: 13px; padding: 8px 10px; border-radius: 7px; border: 1px solid #ddd; background: #fafafa; color: #111; font-family: Arial, sans-serif; transition: border-color 0.15s; }
-  .field input:focus { outline: none; border-color: #1a56db; background: white; }
+  body { 
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
+    background: #1a1a2e; 
+    color: #e0e0e0; 
+    min-height: 100vh; 
+    padding: 2rem 1rem; 
+  }
+  .title { text-align: center; font-size: 24px; font-weight: 700; margin-bottom: 8px; color: #fff; }
+  .subtitle { text-align: center; font-size: 13px; color: #888; margin-bottom: 2rem; }
+  .app { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 900px; margin: 0 auto; align-items: start; }
+  @media (max-width: 700px) { .app { grid-template-columns: 1fr; } }
+  .panel { background: #252540; border: 1px solid #333; border-radius: 12px; padding: 1.5rem; }
+  .panel h2 { font-size: 11px; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; }
+  .field { margin-bottom: 12px; }
+  .field label { display: block; font-size: 12px; font-weight: 600; color: #aaa; margin-bottom: 4px; }
+  .field input { 
+    width: 100%; font-size: 14px; padding: 10px 12px; border-radius: 8px; 
+    border: 1px solid #444; background: #1a1a2e; color: #fff; 
+    font-family: inherit; transition: border-color 0.2s; 
+  }
+  .field input:focus { outline: none; border-color: #4a9eff; background: #222; }
   .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .section-divider { font-size: 11px; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: 0.07em; border-top: 1px solid #f0f0f0; padding-top: 10px; margin-bottom: 10px; margin-top: 4px; }
-  .preview-area { background: #f0f2f5; border-radius: 10px; padding: 1.5rem; display: flex; justify-content: center; align-items: center; min-height: 190px; margin-bottom: 14px; }
-
-  /* Instructions section */
-  .instructions { 
-    background: white; border: 1px solid #e0e0e0; border-radius: 12px; padding: 1.25rem 1.5rem; 
-    margin: 0 auto 1.5rem; max-width: 820px;
+  .section-divider { 
+    font-size: 10px; font-weight: 600; color: #555; text-transform: uppercase; 
+    letter-spacing: 0.1em; border-top: 1px solid #333; padding-top: 10px; margin-bottom: 10px; margin-top: 4px; 
   }
-  .instructions h3 { font-size: 16px; font-weight: 700; margin-bottom: 12px; color: #1a1a2e; }
-  .instructions ol { list-style: none; counter-reset: step-counter; margin: 0; padding: 0; }
-  .instructions li { 
-    counter-increment: step-counter; font-size: 14px; color: #111; margin-bottom: 8px; line-height: 1.5; 
-    position: relative; padding-left: 24px;
+  .preview-area { 
+    background: #1a1a2e; border-radius: 10px; padding: 2rem; 
+    display: flex; justify-content: center; align-items: center; min-height: 220px; 
+    margin-bottom: 14px; border: 1px solid #333;
   }
-  .instructions li::before { 
-    content: counter(step-counter); position: absolute; left: 0; top: 0; background: #1a56db; color: white; 
-    width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; 
-    font-size: 11px; font-weight: 600; 
-  }
-  .instructions strong { font-weight: 700; color: #111; }
-  .instructions em { font-style: italic; color: #666; }
-
-  /* Label with improved styling */
+  
+  /* Label - optimized for M2 thermal printing */
   .label-box {
-    width: 300px; height: 150px; background: white;
+    width: 400px; height: 200px; background: #ffffff;
     font-family: Arial, Helvetica, sans-serif;
-    display: flex; flex-direction: column;
+    display: flex; flex-direction: row;
     overflow: hidden; position: relative;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .label-bar {
+    width: 20px; background: #000000; flex-shrink: 0;
   }
   .label-content {
-    flex: 1; padding: 3px 4px 3px 5px;
-    display: flex; flex-direction: column; justify-content: space-between;
-    min-width: 0; overflow: hidden;
+    flex: 1; padding: 12px 14px 12px 16px;
+    display: flex; flex-direction: column; justify-content: center;
+    min-width: 0;
   }
-  .label-brandname { 
-    font-size: 22px; font-weight: 950; color: #000000; line-height: 0.95; word-break: break-word;
-    text-shadow: 0.5px 0.5px 0 #000000;
+  .label-peptide { 
+    font-size: 32px; font-weight: 900; color: #000000; 
+    line-height: 1; letter-spacing: -0.5px;
+    margin-bottom: 6px;
   }
-  .label-brandname.empty { color: #bbb; font-weight: 400; font-size: 12px; text-shadow: none; }
-  .label-main { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 1px; margin: 1px 0; }
-  .label-line { 
-    font-size: 18px; font-weight: 950; color: #000000; text-transform: uppercase; 
-    line-height: 1.1; word-break: break-word;
-    text-shadow: 0.5px 0.5px 0 #000000;
+  .label-peptide.empty { color: #cccccc; font-weight: 400; font-size: 16px; letter-spacing: 0; }
+  .label-mg { 
+    font-size: 22px; font-weight: 800; color: #000000; 
+    line-height: 1; margin-bottom: 10px;
   }
-  .label-line.empty { color: #bbb; font-weight: 400; text-transform: none; font-size: 11px; text-shadow: none; }
-  .label-dosage-line { 
-    font-size: 18px; font-weight: 950; color: #000000; text-transform: uppercase; 
-    line-height: 1.1; word-break: break-word;
-    text-shadow: 0.5px 0.5px 0 #000000;
+  .label-mg.empty { color: #cccccc; font-weight: 400; font-size: 14px; }
+  .label-dose { 
+    font-size: 16px; font-weight: 600; color: #000000; 
+    line-height: 1.3; margin-bottom: 3px;
   }
-  .label-dosage-line.empty { color: #bbb; font-weight: 400; text-transform: none; font-size: 11px; text-shadow: none; }
-  .label-footer { 
-    border-top: 1px solid #ccc; padding: 2px 5px 2px;
-    display: flex; justify-content: space-between; align-items: center;
+  .label-dose.empty { color: #cccccc; font-weight: 400; font-size: 12px; }
+  .label-cycle { 
+    font-size: 16px; font-weight: 600; color: #000000; 
+    line-height: 1.3; margin-bottom: 3px;
   }
-  .label-footer-text { 
-    font-size: 11px; font-weight: 700; color: #000000; text-transform: uppercase;
+  .label-cycle.empty { color: #cccccc; font-weight: 400; font-size: 12px; }
+  .label-units { 
+    font-size: 16px; font-weight: 600; color: #000000; 
+    line-height: 1.3;
   }
-  .label-qr-wrap { 
-    position: absolute; bottom: 4px; right: 4px;
-    width: 70px; height: 70px; 
+  .label-units.empty { color: #cccccc; font-weight: 400; font-size: 12px; }
+  .label-sidebar {
+    width: 28px; background: #ffffff;
     display: flex; align-items: center; justify-content: center;
-    background: white; border-radius: 2px;
+    flex-shrink: 0; border-left: 1px solid #e0e0e0;
   }
-  .label-qr-wrap img, .label-qr-wrap canvas { width: 70px !important; height: 70px !important; }
-  .label-qr-placeholder { 
-    width: 70px; height: 70px; border: 1px dashed #ccc; border-radius: 2px; 
-    display: flex; align-items: center; justify-content: center; background: white;
+  .label-sidebar-text {
+    writing-mode: vertical-rl; text-orientation: mixed;
+    font-size: 10px; font-weight: 700; color: #000000;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    text-align: center; line-height: 1.4;
+    transform: rotate(180deg);
   }
-  .label-qr-placeholder-text { font-size: 7px; color: #ccc; text-align: center; line-height: 1.4; }
 
   /* Buttons */
   .btn-row { display: flex; gap: 8px; margin-top: 4px; }
-  button { cursor: pointer; font-family: Arial, sans-serif; border-radius: 7px; font-size: 13px; padding: 9px 16px; border: 1px solid #ccc; background: white; color: #111; transition: background 0.15s; font-weight: 500; }
-  button:hover { background: #f0f2f5; }
-  .btn-gen { background: #1a56db; color: white; border-color: #1a56db; flex: 1; }
-  .btn-gen:hover { background: #1446b8; }
+  button { 
+    cursor: pointer; font-family: inherit; border-radius: 8px; font-size: 13px; 
+    padding: 10px 18px; border: 1px solid #444; background: #2a2a45; color: #e0e0e0; 
+    transition: all 0.2s; font-weight: 500; 
+  }
+  button:hover { background: #353560; border-color: #555; }
+  .btn-gen { background: #4a9eff; color: #fff; border-color: #4a9eff; flex: 1; font-weight: 600; }
+  .btn-gen:hover { background: #3a8eef; }
   .btn-dl { flex: 1; }
   .btn-dl:disabled { opacity: 0.4; cursor: not-allowed; }
-  .btn-reset { color: #888; border-color: #e0e0e0; }
-  .hint { font-size: 11px; color: #999; text-align: center; margin-top: 10px; }
-
-  /* Print-specific styles for maximum darkness */
-  @media print {
-    .label-brandname, .label-line, .label-dosage-line, .label-footer-text {
-      color: #000000 !important;
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
-      text-shadow: none !important;
-    }
+  .btn-reset { color: #888; border-color: #444; }
+  .hint { font-size: 11px; color: #666; text-align: center; margin-top: 10px; }
+  .print-tip { 
+    background: #2a2a45; border: 1px solid #444; border-radius: 8px; 
+    padding: 12px 16px; margin-top: 16px; font-size: 12px; color: #aaa; line-height: 1.6;
   }
+  .print-tip strong { color: #4a9eff; }
 </style>
 </head>
 <body>
 
-<div class="title">Peptide Enthusiast Label Generator</div>
-<div class="subtitle">20 × 40mm · fits 3ml peptide vials · Niimbot &amp; compatible label printers</div>
-
-<div class="instructions">
-  <h3>How to Use the Label Generator</h3>
-  <ol>
-    <li>Enter your <strong>source</strong> — The source you purchased your peptide from.</li>
-    <li>Fill in <strong>manufacturer, peptide name, size / amount,</strong> and <strong>date</strong>.</li>
-    <li>Optionally add a <strong>dosage amount</strong> and <strong>units</strong>, and a <strong>URL</strong> to generate a QR code.</li>
-    <li>Click <strong>Generate Label</strong> to confirm, then <strong>Download JPEG</strong>.</li>
-    <li>Print at 100% scale on a <strong>20 × 40mm</strong> label using <em>Niimbot or any compatible label printer</em>. This size fits perfectly on all <strong>3 mL peptide vials</strong>.</li>
-  </ol>
-</div>
+<div class="title">Peptide Label Generator</div>
+<div class="subtitle">40 × 20mm · Niimbot M2 · Matte Silver Labels</div>
 
 <div class="app">
   <div class="panel">
     <div class="field">
-      <label>Source</label>
-      <input type="text" id="brand" placeholder="e.g. CCP's Stockpile" oninput="liveUpdate()" />
-    </div>
-    <div class="field">
-      <label>Manufacturer</label>
-      <input type="text" id="mfr" placeholder="e.g. Wuhan Institute of Virology" oninput="liveUpdate()" />
-    </div>
-    <div class="field">
       <label>Peptide Name</label>
-      <input type="text" id="peptide" placeholder="e.g. BPC-157" oninput="liveUpdate()" />
+      <input type="text" id="peptide" placeholder="e.g. Retatrutide" oninput="liveUpdate()" />
     </div>
     <div class="field-row">
       <div class="field">
-        <label>Size / Amount</label>
-        <input type="text" id="size" placeholder="10mg" oninput="liveUpdate()" />
+        <label>Amount (mg)</label>
+        <input type="text" id="mg" placeholder="30mg" oninput="liveUpdate()" />
       </div>
       <div class="field">
         <label>Date</label>
@@ -155,27 +137,23 @@
       </div>
     </div>
 
-    <div class="section-divider">Dosage (optional)</div>
-    <div class="field-row">
-      <div class="field">
-        <label>Dosage Amount</label>
-        <input type="text" id="dosage" placeholder="300mcg or 1g" oninput="liveUpdate()" />
-      </div>
-      <div class="field">
-        <label>Units</label>
-        <input type="text" id="units" placeholder="20 units" oninput="liveUpdate()" />
-      </div>
-    </div>
-
-    <div class="section-divider">QR code (optional)</div>
+    <div class="section-divider">Dosing Info</div>
     <div class="field">
-      <label>URL for QR code</label>
-      <input type="text" id="url" placeholder="https://example.com" oninput="liveUpdate()" />
+      <label>Dose Schedule</label>
+      <input type="text" id="dose" placeholder="Weekly AM Dose - 1mg" oninput="liveUpdate()" />
+    </div>
+    <div class="field">
+      <label>Cycle / Duration</label>
+      <input type="text" id="cycle" placeholder="8 weeks on, 8 weeks off" oninput="liveUpdate()" />
+    </div>
+    <div class="field">
+      <label>Dose = Units</label>
+      <input type="text" id="units" placeholder="1mg = 10 units" oninput="liveUpdate()" />
     </div>
 
     <div class="btn-row">
       <button class="btn-reset" onclick="resetFields()">Reset</button>
-      <button class="btn-gen" onclick="generateLabel()">Generate label</button>
+      <button class="btn-gen" onclick="generateLabel()">Generate Label</button>
     </div>
   </div>
 
@@ -183,29 +161,31 @@
     <h2>Preview</h2>
     <div class="preview-area">
       <div class="label-box" id="labelBox">
+        <div class="label-bar"></div>
         <div class="label-content">
-          <div class="label-brandname empty" id="prevBrand">Source</div>
-          <div class="label-main">
-            <div class="label-line empty" id="prevMfr">Manufacturer</div>
-            <div class="label-line empty" id="prevPeptide">Peptide Name</div>
-            <div class="label-line empty" id="prevSizeDate">Size / Date</div>
-            <div class="label-dosage-line empty" id="prevDosage">Dosage</div>
-          </div>
-          <div class="label-footer">
-            <div class="label-footer-text">Research use only</div>
-          </div>
+          <div class="label-peptide empty" id="prevPeptide">Peptide Name</div>
+          <div class="label-mg empty" id="prevMg">Amount</div>
+          <div class="label-dose empty" id="prevDose">Dose Schedule</div>
+          <div class="label-cycle empty" id="prevCycle">Cycle / Duration</div>
+          <div class="label-units empty" id="prevUnits">Dose = Units</div>
         </div>
-        <div class="label-qr-wrap" id="qrContainer">
-          <div class="label-qr-placeholder">
-            <div class="label-qr-placeholder-text">QR<br>code</div>
-          </div>
+        <div class="label-sidebar">
+          <div class="label-sidebar-text">For Research Purposes Only<br>Store Refrigerated</div>
         </div>
       </div>
     </div>
     <div class="btn-row">
-      <button class="btn-dl" id="dlBtn" onclick="downloadJpeg()" disabled>Download JPEG</button>
+      <button class="btn-dl" id="dlBtn" onclick="downloadPng()" disabled>Download PNG</button>
     </div>
-    <div class="hint">Preview ~3× actual size &nbsp;·&nbsp; 20×40mm · fits 3ml vials</div>
+    <div class="hint">Preview ~3× actual size · 40×20mm · optimized for M2 black ribbon</div>
+    
+    <div class="print-tip">
+      <strong>Printing tips for M2:</strong><br>
+      • Print at <strong>100% scale</strong> (no fit-to-page)<br>
+      • Use <strong>darkness setting 3-4</strong> for silver labels<br>
+      • PNG output is optimized for 203 DPI thermal printing<br>
+      • Text is pure black (#000) for maximum contrast on silver
+    </div>
   </div>
 </div>
 
@@ -213,52 +193,29 @@
   function val(id) { return document.getElementById(id).value.trim(); }
 
   function liveUpdate() {
-    const brand = val('brand'), mfr = val('mfr'), peptide = val('peptide');
-    const size = val('size'), date = val('date'), url = val('url');
-    const dosage = val('dosage'), units = val('units');
+    const peptide = val('peptide'), mg = val('mg'), date = val('date');
+    const dose = val('dose'), cycle = val('cycle'), units = val('units');
 
-    const pb = document.getElementById('prevBrand');
-    pb.textContent = brand || 'Source';
-    pb.className = 'label-brandname' + (brand ? '' : ' empty');
+    const pp = document.getElementById('prevPeptide');
+    pp.textContent = peptide || 'Peptide Name';
+    pp.className = 'label-peptide' + (peptide ? '' : ' empty');
 
-    setLine('prevMfr', mfr, 'Manufacturer');
-    setLine('prevPeptide', peptide, 'Peptide Name');
+    const pm = document.getElementById('prevMg');
+    const mgText = [mg, date].filter(Boolean).join('  ·  ');
+    pm.textContent = mgText || 'Amount';
+    pm.className = 'label-mg' + (mgText ? '' : ' empty');
 
-    const sizeDateText = [size, date].filter(Boolean).join(' / ');
-    const psd = document.getElementById('prevSizeDate');
-    psd.textContent = sizeDateText ? sizeDateText.toUpperCase() : 'Size / Date';
-    psd.className = 'label-line' + (sizeDateText ? '' : ' empty');
+    const pd = document.getElementById('prevDose');
+    pd.textContent = dose || 'Dose Schedule';
+    pd.className = 'label-dose' + (dose ? '' : ' empty');
 
-    const dosageText = [dosage, units].filter(Boolean).join(' / ');
-    const pd = document.getElementById('prevDosage');
-    pd.textContent = dosageText || 'Dosage';
-    pd.className = 'label-dosage-line' + (dosageText ? '' : ' empty');
+    const pc = document.getElementById('prevCycle');
+    pc.textContent = cycle || 'Cycle / Duration';
+    pc.className = 'label-cycle' + (cycle ? '' : ' empty');
 
-    updateQR(url);
-  }
-
-  function setLine(id, v, placeholder) {
-    const el = document.getElementById(id);
-    el.textContent = v ? v.toUpperCase() : placeholder;
-    el.className = 'label-line' + (v ? '' : ' empty');
-  }
-
-  function updateQR(url) {
-    const container = document.getElementById('qrContainer');
-    if (!url) {
-      container.innerHTML = '<div class="label-qr-placeholder"><div class="label-qr-placeholder-text">QR<br>code</div></div>';
-      return;
-    }
-    container.innerHTML = '<div id="qrCode"></div>';
-    try {
-      new QRCode(document.getElementById('qrCode'), {
-        text: url, width: 70, height: 70,
-        colorDark: '#000000', colorLight: '#ffffff',
-        correctLevel: QRCode.CorrectLevel.M
-      });
-    } catch(e) {
-      container.innerHTML = '<div class="label-qr-placeholder"><div class="label-qr-placeholder-text">QR<br>code</div></div>';
-    }
+    const pu = document.getElementById('prevUnits');
+    pu.textContent = units || 'Dose = Units';
+    pu.className = 'label-units' + (units ? '' : ' empty');
   }
 
   function generateLabel() {
@@ -269,23 +226,30 @@
   }
 
   function resetFields() {
-    ['brand','mfr','peptide','size','date','url','dosage','units'].forEach(id => document.getElementById(id).value = '');
+    ['peptide','mg','date','dose','cycle','units'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('dlBtn').disabled = true;
     document.getElementById('dlBtn').style.opacity = '';
     liveUpdate();
   }
 
-  function downloadJpeg() {
+  function downloadPng() {
     const label = document.getElementById('labelBox');
+    // Scale 5x for crisp 203 DPI output (400px × 5 = 2000px wide = ~319px at 203 DPI... wait)
+    // Actually: 400px × 5 = 2000px. At 96 DPI screen that's ~20.8 inches. 
+    // For M2 at 203 DPI, 40mm = 319px, 20mm = 159px
+    // So we want output at 319×159px for actual size, but let's do 2x for quality = 638×318px
     html2canvas(label, {
-      scale: 4,
+      scale: 2,
       backgroundColor: '#ffffff',
       useCORS: true,
-      logging: false
+      logging: false,
+      imageSmoothingEnabled: false,
+      letterRendering: true
     }).then(canvas => {
       const link = document.createElement('a');
-      link.download = 'peptide-label.jpg';
-      link.href = canvas.toDataURL('image/jpeg', 0.97);
+      const peptideName = val('peptide') || 'peptide';
+      link.download = peptideName.replace(/[^a-zA-Z0-9]/g, '_') + '_label.png';
+      link.href = canvas.toDataURL('image/png');
       link.click();
     });
   }
