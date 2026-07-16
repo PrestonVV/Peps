@@ -58,12 +58,12 @@
     min-width: 0;
   }
   .label-qr {
-    width: 70px; display: flex; align-items: center; justify-content: center;
+    width: 100px; display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
   }
-  .label-qr canvas, .label-qr img { width: 70px !important; height: 70px !important; }
+  .label-qr canvas, .label-qr img { width: 100px !important; height: 100px !important; }
   .label-qr-placeholder {
-    width: 70px; height: 70px;
+    width: 100px; height: 100px;
     border: 1px dashed #cccccc;
     display: flex; align-items: center; justify-content: center;
     font-size: 10px; color: #cccccc; text-align: center;
@@ -244,26 +244,14 @@
       return;
     }
     qrContainer.innerHTML = '';
-    
-    try {
-      // Use QRCode library (qrcodejs)
-      if (typeof QRCode !== 'undefined') {
-        new QRCode(qrContainer, {
-          text: url,
-          width: 70,
-          height: 70,
-          colorDark: '#000000',
-          colorLight: '#ffffff',
-          correctLevel: QRCode.CorrectLevel.M
-        });
-      } else {
-        qrContainer.innerHTML = '<div class="label-qr-placeholder">QR</div>';
-        console.error('QRCode library not loaded');
-      }
-    } catch (e) {
-      console.error('QR Code generation failed:', e);
-      qrContainer.innerHTML = '<div class="label-qr-placeholder">QR</div>';
-    }
+    new QRCode(qrContainer, {
+      text: url,
+      width: 100,
+      height: 100,
+      colorDark: '#000000',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H
+    });
   }
 
   function generateLabel() {
