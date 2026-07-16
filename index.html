@@ -43,63 +43,65 @@
   
   /* Label - optimized for M2 thermal printing */
   .label-box {
-    width: 400px; height: 200px; background: #ffffff;
+    width: 320px; height: 160px; background: #ffffff;
     font-family: Arial, Helvetica, sans-serif;
     display: flex; flex-direction: column;
     overflow: hidden; position: relative;
     box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    transform: scale(1.25);
+    transform-origin: center center;
   }
   .label-main {
     flex: 1; display: flex; flex-direction: row;
-    padding: 12px 14px 8px 14px;
+    padding: 10px 11px 6px 11px;
   }
   .label-content {
     flex: 1; display: flex; flex-direction: column; justify-content: center;
     min-width: 0;
   }
   .label-qr {
-    width: 100px; display: flex; align-items: center; justify-content: center;
+    width: 80px; display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
   }
-  .label-qr canvas, .label-qr img { width: 100px !important; height: 100px !important; }
+  .label-qr canvas, .label-qr img { width: 80px !important; height: 80px !important; }
   .label-qr-placeholder {
-    width: 100px; height: 100px;
+    width: 80px; height: 80px;
     border: 1px dashed #cccccc;
     display: flex; align-items: center; justify-content: center;
-    font-size: 10px; color: #cccccc; text-align: center;
+    font-size: 8px; color: #cccccc; text-align: center;
   }
   .label-peptide { 
-    font-size: 32px; font-weight: 900; color: #000000; 
-    line-height: 1; letter-spacing: -0.5px;
-    margin-bottom: 6px;
+    font-size: 26px; font-weight: 900; color: #000000; 
+    line-height: 1; letter-spacing: -0.4px;
+    margin-bottom: 5px;
   }
-  .label-peptide.empty { color: #cccccc; font-weight: 400; font-size: 16px; letter-spacing: 0; }
+  .label-peptide.empty { color: #cccccc; font-weight: 400; font-size: 13px; letter-spacing: 0; }
   .label-mg { 
-    font-size: 22px; font-weight: 800; color: #000000; 
-    line-height: 1; margin-bottom: 10px;
+    font-size: 18px; font-weight: 800; color: #000000; 
+    line-height: 1; margin-bottom: 8px;
   }
-  .label-mg.empty { color: #cccccc; font-weight: 400; font-size: 14px; }
+  .label-mg.empty { color: #cccccc; font-weight: 400; font-size: 11px; }
   .label-dose { 
-    font-size: 16px; font-weight: 600; color: #000000; 
-    line-height: 1.3; margin-bottom: 3px;
+    font-size: 13px; font-weight: 600; color: #000000; 
+    line-height: 1.3; margin-bottom: 2px;
   }
-  .label-dose.empty { color: #cccccc; font-weight: 400; font-size: 12px; }
+  .label-dose.empty { color: #cccccc; font-weight: 400; font-size: 10px; }
   .label-cycle { 
-    font-size: 16px; font-weight: 600; color: #000000; 
-    line-height: 1.3; margin-bottom: 3px;
+    font-size: 13px; font-weight: 600; color: #000000; 
+    line-height: 1.3; margin-bottom: 2px;
   }
-  .label-cycle.empty { color: #cccccc; font-weight: 400; font-size: 12px; }
+  .label-cycle.empty { color: #cccccc; font-weight: 400; font-size: 10px; }
   .label-units { 
-    font-size: 16px; font-weight: 600; color: #000000; 
+    font-size: 13px; font-weight: 600; color: #000000; 
     line-height: 1.3;
   }
-  .label-units.empty { color: #cccccc; font-weight: 400; font-size: 12px; }
+  .label-units.empty { color: #cccccc; font-weight: 400; font-size: 10px; }
   .label-footer {
     border-top: 1px solid #e0e0e0;
-    padding: 6px 14px;
+    padding: 5px 11px;
     text-align: center;
-    font-size: 10px; font-weight: 700; color: #000000;
-    text-transform: uppercase; letter-spacing: 0.5px;
+    font-size: 8px; font-weight: 700; color: #000000;
+    text-transform: uppercase; letter-spacing: 0.4px;
   }
 
   /* Buttons */
@@ -246,8 +248,8 @@
     qrContainer.innerHTML = '';
     new QRCode(qrContainer, {
       text: url,
-      width: 100,
-      height: 100,
+      width: 80,
+      height: 80,
       colorDark: '#000000',
       colorLight: '#ffffff',
       correctLevel: QRCode.CorrectLevel.H
@@ -259,7 +261,6 @@
     const dlBtn = document.getElementById('dlBtn');
     dlBtn.disabled = false;
     dlBtn.style.opacity = '1';
-    console.log('Label generated, download enabled');
   }
 
   function resetFields() {
@@ -271,30 +272,36 @@
   }
 
   function downloadPng() {
-    console.log('Download clicked');
     const label = document.getElementById('labelBox');
+    
+    // Remove the transform temporarily for clean capture
+    const originalTransform = label.style.transform;
+    label.style.transform = 'none';
     
     html2canvas(label, {
       scale: 1,
       backgroundColor: '#ffffff',
       useCORS: true,
-      logging: true,
+      logging: false,
       imageSmoothingEnabled: false,
-      letterRendering: true,
-      removeContainer: true
+      letterRendering: true
     }).then(canvas => {
-      console.log('Canvas created:', canvas.width, 'x', canvas.height);
+      // Restore transform
+      label.style.transform = originalTransform;
+      
+      // Ensure exact 320x160px output
+      const finalCanvas = document.createElement('canvas');
+      finalCanvas.width = 320;
+      finalCanvas.height = 160;
+      const ctx = finalCanvas.getContext('2d');
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(canvas, 0, 0, 320, 160);
       
       const link = document.createElement('a');
       const peptideName = val('peptide') || 'peptide';
       link.download = peptideName.replace(/[^a-zA-Z0-9]/g, '_') + '_label.png';
-      link.href = canvas.toDataURL('image/png');
-      
-      console.log('Downloading:', link.download);
+      link.href = finalCanvas.toDataURL('image/png');
       link.click();
-    }).catch(err => {
-      console.error('Download failed:', err);
-      alert('Download failed. Please try again.');
     });
   }
 
