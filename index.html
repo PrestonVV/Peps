@@ -60,12 +60,12 @@
     min-width: 0;
   }
   .label-qr {
-    width: 110px; display: flex; align-items: center; justify-content: center;
+    width: 90px; display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
   }
-  .label-qr canvas, .label-qr img { width: 110px !important; height: 110px !important; }
+  .label-qr canvas, .label-qr img { width: 90px !important; height: 90px !important; }
   .label-qr-placeholder {
-    width: 110px; height: 110px;
+    width: 90px; height: 90px;
     border: 1px dashed #cccccc;
     display: flex; align-items: center; justify-content: center;
     font-size: 8px; color: #cccccc; text-align: center;
@@ -134,12 +134,12 @@
   <div class="panel">
     <div class="field">
       <label>Peptide Name</label>
-      <input type="text" id="peptide" placeholder="e.g. Retatrutide" oninput="liveUpdate()" />
+      <input type="text" id="peptide" placeholder="BPC157/TB500" oninput="liveUpdate()" />
     </div>
     <div class="field-row">
       <div class="field">
         <label>Amount (mg)</label>
-        <input type="text" id="mg" placeholder="30mg" oninput="liveUpdate()" />
+        <input type="text" id="mg" placeholder="10mg/10mg" oninput="liveUpdate()" />
       </div>
       <div class="field">
         <label>Date</label>
@@ -150,21 +150,21 @@
     <div class="section-divider">Dosing Info</div>
     <div class="field">
       <label>Dose Schedule</label>
-      <input type="text" id="dose" placeholder="Weekly AM Dose - 1mg" oninput="liveUpdate()" />
+      <input type="text" id="dose" placeholder="Daily AM Dose - 250mcg" oninput="liveUpdate()" />
     </div>
     <div class="field">
       <label>Cycle / Duration</label>
-      <input type="text" id="cycle" placeholder="8 weeks on, 8 weeks off" oninput="liveUpdate()" />
+      <input type="text" id="cycle" placeholder="Everyday for 8 weeks" oninput="liveUpdate()" />
     </div>
     <div class="field">
       <label>Dose = Units</label>
-      <input type="text" id="units" placeholder="1mg = 10 units" oninput="liveUpdate()" />
+      <input type="text" id="units" placeholder="250mcg = 5 units" oninput="liveUpdate()" />
     </div>
 
     <div class="section-divider">QR Code</div>
     <div class="field">
       <label>QR Code URL</label>
-      <input type="text" id="qrUrl" placeholder="https://example.com/coa" oninput="updateQR()" />
+      <input type="text" id="qrUrl" placeholder="https://tinyurl.com/5n7tz9er" oninput="updateQR()" />
     </div>
 
     <div class="btn-row">
@@ -248,8 +248,8 @@
     qrContainer.innerHTML = '';
     new QRCode(qrContainer, {
       text: url,
-      width: 110,
-      height: 110,
+      width: 90,
+      height: 90,
       colorDark: '#000000',
       colorLight: '#ffffff',
       correctLevel: QRCode.CorrectLevel.H,
