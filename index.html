@@ -60,12 +60,12 @@
     min-width: 0;
   }
   .label-qr {
-    width: 90px; display: flex; align-items: center; justify-content: center;
+    width: 100px; display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
   }
-  .label-qr canvas, .label-qr img { width: 90px !important; height: 90px !important; }
+  .label-qr canvas, .label-qr img { width: 100px !important; height: 100px !important; image-rendering: pixelated; image-rendering: crisp-edges; }
   .label-qr-placeholder {
-    width: 90px; height: 90px;
+    width: 100px; height: 100px;
     border: 1px dashed #cccccc;
     display: flex; align-items: center; justify-content: center;
     font-size: 8px; color: #cccccc; text-align: center;
@@ -246,15 +246,31 @@
       return;
     }
     qrContainer.innerHTML = '';
-    new QRCode(qrContainer, {
+
+    // Render QR at high internal resolution (200x200) for crisp modules,
+    // then convert canvas -> data URL -> <img> so html2canvas captures it
+    // reliably (html2canvas is flaky with <canvas> elements from QRCode.js).
+    const tmp = document.createElement('div');
+    new QRCode(tmp, {
       text: url,
-      width: 90,
-      height: 90,
+      width: 200,
+      height: 200,
       colorDark: '#000000',
       colorLight: '#ffffff',
       correctLevel: QRCode.CorrectLevel.H,
-      margin: 2
+      margin: 1
     });
+    const qrCanvas = tmp.querySelector('canvas');
+    if (qrCanvas) {
+      const img = document.createElement('img');
+      img.src = qrCanvas.toDataURL('image/png');
+      img.alt = 'QR';
+      qrContainer.appendChild(img);
+    } else {
+      // Fallback if QRCode lib used <img> instead of <canvas>
+      const qrImg = tmp.querySelector('img');
+      if (qrImg) qrContainer.appendChild(qrImg.cloneNode(true));
+    }
   }
 
   function generateLabel() {
