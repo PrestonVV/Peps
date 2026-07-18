@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Peptide Label Generator — M2 Optimized</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -59,12 +60,12 @@
     min-width: 0;
   }
   .label-qr {
-    width: 100px; display: flex; align-items: center; justify-content: center;
+    width: 110px; display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
   }
-  .label-qr canvas, .label-qr img { width: 100px !important; height: 100px !important; image-rendering: pixelated; image-rendering: crisp-edges; }
+  .label-qr canvas, .label-qr img { width: 110px !important; height: 110px !important; }
   .label-qr-placeholder {
-    width: 100px; height: 100px;
+    width: 110px; height: 110px;
     border: 1px dashed #cccccc;
     display: flex; align-items: center; justify-content: center;
     font-size: 8px; color: #cccccc; text-align: center;
@@ -162,7 +163,11 @@
 
     <div class="section-divider">QR Code</div>
     <div class="field">
-      <label>Upload QR Code Image</label>
+      <label>QR Code URL (auto-generates clean QR)</label>
+      <input type="text" id="qrUrl" placeholder="https://tinyurl.com/4uwynskn" value="https://tinyurl.com/4uwynskn" oninput="updateQR()" />
+    </div>
+    <div class="field">
+      <label>Or Upload Custom QR Image</label>
       <input type="file" id="qrImage" accept="image/*" onchange="loadQRImage(event)" style="padding: 8px 10px; font-size: 13px;" />
     </div>
 
@@ -212,6 +217,7 @@
   function liveUpdate() {
     const peptide = val('peptide'), mg = val('mg'), date = val('date');
     const dose = val('dose'), cycle = val('cycle'), units = val('units');
+    const qrUrl = val('qrUrl');
 
     const pp = document.getElementById('prevPeptide');
     pp.textContent = peptide || 'Peptide Name';
@@ -233,6 +239,39 @@
     const pu = document.getElementById('prevUnits');
     pu.textContent = units || 'Dose = Units';
     pu.className = 'label-units' + (units ? '' : ' empty');
+
+    updateQR(qrUrl);
+  }
+
+  function updateQR(url) {
+    const qrContainer = document.getElementById('labelQr');
+    if (!url) {
+      qrContainer.innerHTML = '<div class="label-qr-placeholder">QR</div>';
+      return;
+    }
+    qrContainer.innerHTML = '';
+
+    // Render QR at high internal resolution for crisp modules
+    const tmp = document.createElement('div');
+    new QRCode(tmp, {
+      text: url,
+      width: 200,
+      height: 200,
+      colorDark: '#000000',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H,
+      margin: 1
+    });
+    const qrCanvas = tmp.querySelector('canvas');
+    if (qrCanvas) {
+      const img = document.createElement('img');
+      img.src = qrCanvas.toDataURL('image/png');
+      img.alt = 'QR';
+      qrContainer.appendChild(img);
+    } else {
+      const qrImg = tmp.querySelector('img');
+      if (qrImg) qrContainer.appendChild(qrImg.cloneNode(true));
+    }
   }
 
   function loadQRImage(event) {
@@ -241,7 +280,7 @@
     const reader = new FileReader();
     reader.onload = function(e) {
       const qrContainer = document.getElementById('labelQr');
-      qrContainer.innerHTML = '<img src="' + e.target.result + '" style="width:90px;height:90px;object-fit:contain;" />';
+      qrContainer.innerHTML = '<img src="' + e.target.result + '" style="width:110px;height:110px;object-fit:contain;" />';
     };
     reader.readAsDataURL(file);
   }
@@ -254,7 +293,7 @@
   }
 
   function resetFields() {
-    ['peptide','mg','date','dose','cycle','units'].forEach(id => document.getElementById(id).value = '');
+    ['peptide','mg','date','dose','cycle','units','qrUrl'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('qrImage').value = '';
     document.getElementById('dlBtn').disabled = true;
     document.getElementById('dlBtn').style.opacity = '0.4';
@@ -300,6 +339,7 @@
   window.addEventListener('load', function() {
     console.log('Page loaded');
     console.log('html2canvas:', typeof html2canvas);
+    console.log('QRCode:', typeof QRCode);
   });
 </script>
 </body>
