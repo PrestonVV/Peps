@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Peptide Label Generator — M2 Optimized</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -163,8 +162,8 @@
 
     <div class="section-divider">QR Code</div>
     <div class="field">
-      <label>QR Code URL</label>
-      <input type="text" id="qrUrl" placeholder="https://tinyurl.com/5n7tz9er" oninput="updateQR()" />
+      <label>Upload QR Code Image</label>
+      <input type="file" id="qrImage" accept="image/*" onchange="loadQRImage(event)" style="padding: 8px 10px; font-size: 13px;" />
     </div>
 
     <div class="btn-row">
@@ -213,7 +212,6 @@
   function liveUpdate() {
     const peptide = val('peptide'), mg = val('mg'), date = val('date');
     const dose = val('dose'), cycle = val('cycle'), units = val('units');
-    const qrUrl = val('qrUrl');
 
     const pp = document.getElementById('prevPeptide');
     pp.textContent = peptide || 'Peptide Name';
@@ -235,42 +233,17 @@
     const pu = document.getElementById('prevUnits');
     pu.textContent = units || 'Dose = Units';
     pu.className = 'label-units' + (units ? '' : ' empty');
-
-    updateQR(qrUrl);
   }
 
-  function updateQR(url) {
-    const qrContainer = document.getElementById('labelQr');
-    if (!url) {
-      qrContainer.innerHTML = '<div class="label-qr-placeholder">QR</div>';
-      return;
-    }
-    qrContainer.innerHTML = '';
-
-    // Render QR at high internal resolution (200x200) for crisp modules,
-    // then convert canvas -> data URL -> <img> so html2canvas captures it
-    // reliably (html2canvas is flaky with <canvas> elements from QRCode.js).
-    const tmp = document.createElement('div');
-    new QRCode(tmp, {
-      text: url,
-      width: 200,
-      height: 200,
-      colorDark: '#000000',
-      colorLight: '#ffffff',
-      correctLevel: QRCode.CorrectLevel.H,
-      margin: 1
-    });
-    const qrCanvas = tmp.querySelector('canvas');
-    if (qrCanvas) {
-      const img = document.createElement('img');
-      img.src = qrCanvas.toDataURL('image/png');
-      img.alt = 'QR';
-      qrContainer.appendChild(img);
-    } else {
-      // Fallback if QRCode lib used <img> instead of <canvas>
-      const qrImg = tmp.querySelector('img');
-      if (qrImg) qrContainer.appendChild(qrImg.cloneNode(true));
-    }
+  function loadQRImage(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const qrContainer = document.getElementById('labelQr');
+      qrContainer.innerHTML = '<img src="' + e.target.result + '" style="width:90px;height:90px;object-fit:contain;" />';
+    };
+    reader.readAsDataURL(file);
   }
 
   function generateLabel() {
@@ -281,7 +254,8 @@
   }
 
   function resetFields() {
-    ['peptide','mg','date','dose','cycle','units','qrUrl'].forEach(id => document.getElementById(id).value = '');
+    ['peptide','mg','date','dose','cycle','units'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('qrImage').value = '';
     document.getElementById('dlBtn').disabled = true;
     document.getElementById('dlBtn').style.opacity = '0.4';
     document.getElementById('labelQr').innerHTML = '<div class="label-qr-placeholder">QR</div>';
@@ -326,7 +300,6 @@
   window.addEventListener('load', function() {
     console.log('Page loaded');
     console.log('html2canvas:', typeof html2canvas);
-    console.log('QRCode:', typeof QRCode);
   });
 </script>
 </body>
