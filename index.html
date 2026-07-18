@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Peptide Label Generator — M2 Optimized</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bwip-js@4.5.1/dist/bwip-js-min.js"></script>
   
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -63,7 +63,7 @@
     width: 80px; display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
   }
-  .label-qr canvas, .label-qr img { width: 80px !important; height: 80px !important; }
+  .label-qr canvas, .label-qr img { width: 80px !important; height: 80px !important; image-rendering: pixelated; image-rendering: crisp-edges; }
   .label-qr-placeholder {
     width: 80px; height: 80px;
     border: 1px dashed #cccccc;
@@ -161,13 +161,13 @@
       <input type="text" id="units" placeholder="250mcg = 5 units" oninput="liveUpdate()" />
     </div>
 
-    <div class="section-divider">QR Code</div>
+    <div class="section-divider">Data Matrix Code</div>
     <div class="field">
-      <label>QR Code URL (auto-generates clean QR)</label>
+      <label>Data Matrix URL (auto-generates clean DM code)</label>
       <input type="text" id="qrUrl" placeholder="https://tinyurl.com/4uwynskn" value="https://tinyurl.com/4uwynskn" oninput="updateQR()" />
     </div>
     <div class="field">
-      <label>Or Upload Custom QR Image</label>
+      <label>Or Upload Custom Data Matrix Image</label>
       <input type="file" id="qrImage" accept="image/*" onchange="loadQRImage(event)" style="padding: 8px 10px; font-size: 13px;" />
     </div>
 
@@ -190,7 +190,7 @@
             <div class="label-units empty" id="prevUnits">Dose = Units</div>
           </div>
           <div class="label-qr" id="labelQr">
-            <div class="label-qr-placeholder">QR</div>
+            <div class="label-qr-placeholder">DM</div>
           </div>
         </div>
         <div class="label-footer">For Research Purposes Only</div>
@@ -199,7 +199,7 @@
     <div class="btn-row">
       <button class="btn-dl" id="dlBtn" onclick="downloadPng()" disabled>Download PNG</button>
     </div>
-    <div class="hint">Preview ~3× actual size · 40×20mm · optimized for M2 black ribbon</div>
+    <div class="hint">Preview ~3× actual size · 40×20mm · Data Matrix optimized for curved vials</div>
     
     <div class="print-tip">
       <strong>Printing tips for M2:</strong><br>
@@ -246,31 +246,32 @@
   function updateQR(url) {
     const qrContainer = document.getElementById('labelQr');
     if (!url) {
-      qrContainer.innerHTML = '<div class="label-qr-placeholder">QR</div>';
+      qrContainer.innerHTML = '<div class="label-qr-placeholder">DM</div>';
       return;
     }
     qrContainer.innerHTML = '';
 
-    // Render QR at high internal resolution for crisp modules
-    const tmp = document.createElement('div');
-    new QRCode(tmp, {
-      text: url,
-      width: 200,
-      height: 200,
-      colorDark: '#000000',
-      colorLight: '#ffffff',
-      correctLevel: QRCode.CorrectLevel.H,
-      margin: 1
-    });
-    const qrCanvas = tmp.querySelector('canvas');
-    if (qrCanvas) {
+    // Generate Data Matrix code (better for curved surfaces than QR)
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = 200;
+      canvas.height = 200;
+      
+      bwipjs.toCanvas(canvas, {
+        bcid: 'datamatrix',
+        text: url,
+        scale: 4,
+        includetext: false,
+        textxalign: 'center'
+      });
+      
       const img = document.createElement('img');
-      img.src = qrCanvas.toDataURL('image/png');
-      img.alt = 'QR';
+      img.src = canvas.toDataURL('image/png');
+      img.alt = 'Data Matrix';
       qrContainer.appendChild(img);
-    } else {
-      const qrImg = tmp.querySelector('img');
-      if (qrImg) qrContainer.appendChild(qrImg.cloneNode(true));
+    } catch (e) {
+      console.error('Data Matrix generation failed:', e);
+      qrContainer.innerHTML = '<div class="label-qr-placeholder">Error</div>';
     }
   }
 
@@ -297,7 +298,7 @@
     document.getElementById('qrImage').value = '';
     document.getElementById('dlBtn').disabled = true;
     document.getElementById('dlBtn').style.opacity = '0.4';
-    document.getElementById('labelQr').innerHTML = '<div class="label-qr-placeholder">QR</div>';
+    document.getElementById('labelQr').innerHTML = '<div class="label-qr-placeholder">DM</div>';
     liveUpdate();
   }
 
@@ -339,7 +340,7 @@
   window.addEventListener('load', function() {
     console.log('Page loaded');
     console.log('html2canvas:', typeof html2canvas);
-    console.log('QRCode:', typeof QRCode);
+    console.log('bwipjs:', typeof bwipjs);
   });
 </script>
 </body>
