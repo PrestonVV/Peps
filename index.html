@@ -161,13 +161,13 @@
       <input type="text" id="units" placeholder="250mcg = 5 units" oninput="liveUpdate()" />
     </div>
 
-    <div class="section-divider">Aztec Code</div>
+    <div class="section-divider">Data Matrix Code</div>
     <div class="field">
-      <label>Aztec URL (most compact, best for curves)</label>
+      <label>Data Matrix URL (widely supported by phones)</label>
       <input type="text" id="qrUrl" placeholder="https://tinyurl.com/4uwynskn" value="https://tinyurl.com/4uwynskn" oninput="updateQR()" />
     </div>
     <div class="field">
-      <label>Or Upload Custom Aztec Image</label>
+      <label>Or Upload Custom Data Matrix Image</label>
       <input type="file" id="qrImage" accept="image/*" onchange="loadQRImage(event)" style="padding: 8px 10px; font-size: 13px;" />
     </div>
 
@@ -190,7 +190,7 @@
             <div class="label-units empty" id="prevUnits">Dose = Units</div>
           </div>
           <div class="label-qr" id="labelQr">
-            <div class="label-qr-placeholder">AZ</div>
+            <div class="label-qr-placeholder">DM</div>
           </div>
         </div>
         <div class="label-footer">For Research Purposes Only</div>
@@ -199,7 +199,7 @@
     <div class="btn-row">
       <button class="btn-dl" id="dlBtn" onclick="downloadPng()" disabled>Download PNG</button>
     </div>
-    <div class="hint">Preview ~3× actual size · 40×20mm · Aztec optimized for curved vials</div>
+    <div class="hint">Preview ~3× actual size · 40×20mm · Data Matrix for curved vials</div>
     
     <div class="print-tip">
       <strong>Printing tips for M2:</strong><br>
@@ -246,19 +246,19 @@
   function updateQR(url) {
     const qrContainer = document.getElementById('labelQr');
     if (!url) {
-      qrContainer.innerHTML = '<div class="label-qr-placeholder">AZ</div>';
+      qrContainer.innerHTML = '<div class="label-qr-placeholder">DM</div>';
       return;
     }
     qrContainer.innerHTML = '';
 
-    // Generate Aztec code (most compact, best for curved surfaces)
+    // Generate Data Matrix code (widely supported, good for curves)
     try {
       const canvas = document.createElement('canvas');
       canvas.width = 200;
       canvas.height = 200;
       
       bwipjs.toCanvas(canvas, {
-        bcid: 'azteccode',
+        bcid: 'datamatrix',
         text: url,
         scale: 4,
         includetext: false,
@@ -267,10 +267,10 @@
       
       const img = document.createElement('img');
       img.src = canvas.toDataURL('image/png');
-      img.alt = 'Aztec';
+      img.alt = 'Data Matrix';
       qrContainer.appendChild(img);
     } catch (e) {
-      console.error('Aztec generation failed:', e);
+      console.error('Data Matrix generation failed:', e);
       qrContainer.innerHTML = '<div class="label-qr-placeholder">Error</div>';
     }
   }
@@ -298,7 +298,7 @@
     document.getElementById('qrImage').value = '';
     document.getElementById('dlBtn').disabled = true;
     document.getElementById('dlBtn').style.opacity = '0.4';
-    document.getElementById('labelQr').innerHTML = '<div class="label-qr-placeholder">AZ</div>';
+    document.getElementById('labelQr').innerHTML = '<div class="label-qr-placeholder">DM</div>';
     liveUpdate();
   }
 
